@@ -1,0 +1,24 @@
+# 認証情報・APIキー（絶対にコミットしない）
+config.yaml
+data/service_account.json
+
+# データベース・顧客データ
+data/*.db
+data/exports/
+data/*.csv
+
+# ログ
+logs/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# macOS
+.DS_Store
+
+# スクリーンショット（エラー時の自動保存）
+logs/*.png

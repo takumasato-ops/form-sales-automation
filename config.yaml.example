@@ -1,0 +1,80 @@
+# ============================================================
+# フォーム営業自動化ツール 設定ファイル（サンプル）
+# このファイルをコピーして config.yaml を作成してください
+# cp config.yaml.example config.yaml
+# ============================================================
+
+# Gemini API設定
+gemini:
+  api_key: "YOUR_GEMINI_API_KEY"
+  model: "gemini-2.5-flash"
+
+# 送信制御
+rate_limit:
+  max_per_day: 1000
+  min_interval_sec: 8
+  max_interval_sec: 18
+  business_hours_only: true
+  business_hour_start: 6
+  business_hour_end: 21
+
+# ターゲット企業フィルタリング設定
+targeting:
+  min_employees: 20
+  max_employees: 1000
+  min_capital_man: 30000
+  max_capital_man: 10000000
+  skip_tse_prime: true
+  skip_tse_standard: true
+  skip_tse_growth: true
+  on_unknown: "send"
+
+# 法令遵守設定
+compliance:
+  skip_on_refusal: true
+  refusal_keywords:
+    - "営業お断り"
+    - "営業メールお断り"
+    - "営業のご連絡はお断り"
+    - "セールスお断り"
+    - "勧誘お断り"
+    - "売り込みお断り"
+    - "営業目的のお問い合わせはご遠慮"
+    - "営業についてはお控え"
+
+# ブラウザ設定
+browser:
+  headless: true
+  timeout_sec: 30
+  screenshot_on_error: true
+
+# 日程調整設定
+scheduling:
+  days_after_send: 7
+  time_range_start: "10:00"
+  time_range_end: "19:00"
+  num_slots: 3
+  booking_url: ""
+
+# 送信者情報
+sender:
+  company: "株式会社〇〇"
+  name: "山田 太郎"
+  name_sei: "山田"
+  name_mei: "太郎"
+  email: "taro.yamada@example.com"
+  phone: "06-0000-0000"
+  mobile: "090-0000-0000"
+  title: "営業部長"
+
+# Google Sheets連携設定（オプション）
+sheets:
+  service_account_json: "data/service_account.json"
+  spreadsheet_id: "YOUR_SPREADSHEET_ID"
+  sheet_name: "営業データ"
+
+# Slack通知設定
+slack:
+  bot_token: "xoxb-YOUR-BOT-TOKEN"
+  webhook_url: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+  channel: "営業部"

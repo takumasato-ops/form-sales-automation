@@ -1,0 +1,9 @@
+playwright==1.49.1
+google-genai==1.14.0
+beautifulsoup4==4.12.3
+aiohttp==3.11.11
+pydantic==2.10.4
+rich==13.9.4
+pyyaml==6.0.2
+gspread>=6.0.0          # Google Sheets連携（オプション）
+google-auth>=2.0.0      # Sheets認証用（オプション）
