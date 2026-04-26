@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.canalair.form-sales</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/python3</string>
+        <string>/Users/satotakuma/新Claude Code/form-sales-automation/main.py</string>
+        <string>run</string>
+        <string>--max</string>
+        <string>15</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/satotakuma/新Claude Code/form-sales-automation</string>
+
+    <!-- 毎日 7:00〜19:00 を30分ごとに実行（25スロット × 15件 = 最大375件/日） -->
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict><key>Hour</key><integer>7</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>7</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>10</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>10</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>11</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>11</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>12</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>12</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>13</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>13</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>14</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>14</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>15</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>15</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>16</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>16</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>17</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>18</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>18</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>19</integer><key>Minute</key><integer>0</integer></dict>
+    </array>
+
+    <key>StandardOutPath</key>
+    <string>/Users/satotakuma/新Claude Code/form-sales-automation/logs/launchd_run.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/satotakuma/新Claude Code/form-sales-automation/logs/launchd_run.log</string>
+
+    <!-- macがスリープから復帰した際にスキップした実行を補完しない（多重送信防止） -->
+    <key>IgnoreProcessGroupAtShutdown</key>
+    <true/>
+</dict>
+</plist>

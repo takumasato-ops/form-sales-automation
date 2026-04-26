@@ -491,10 +491,10 @@ def cmd_templates():
     table.add_column("ファイル", style="dim")
     table.add_column("用途", style="magenta")
     descriptions = {
-        "default":       "汎用・長文版（全業種対応）",
-        "default_short": "汎用・短文版 A/Bテスト用",
+        "default":       "汎用・長文版（全業種対応）※メイン使用",
+        "default_short": "汎用・短文版（未使用）",
         "it":            "IT・SaaS向け長文版",
-        "it_short":      "IT・SaaS向け短文版 A/Bテスト用",
+        "it_short":      "IT・SaaS向け短文版（未使用）",
         "education":     "教育業界向け",
     }
     for name in sorted(available):

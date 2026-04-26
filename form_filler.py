@@ -553,8 +553,8 @@ async def fill_form(
 
         # 送信成功の判定
         page_text = await page.inner_text("body")
-        error_indicators = ["入力内容に誤り", "必須項目です", "正しく入力", "入力してください", "必須項目が", "is required"]
-        success_indicators = ["送信完了", "ありがとうございます", "送信しました", "受け付けました", "thank you", "送信が完了", "Thank you"]
+        error_indicators = ["入力内容に誤り", "正しく入力されていない", "入力エラー", "エラーが発生"]
+        success_indicators = ["送信完了", "ありがとうございます", "送信しました", "受け付けました", "thank you", "送信が完了", "Thank you", "お問い合わせを受け付け", "メッセージを受け付け"]
 
         has_error = any(ind in page_text for ind in error_indicators)
         has_success = any(ind in page_text for ind in success_indicators)
@@ -564,8 +564,13 @@ async def fill_form(
         elif has_error:
             result["error"] += "フォームにエラー表示を検出"
         else:
-            result["success"] = True
-            result["error"] += "(成功判定は推定)"
+            # 成功/失敗が判定できない場合は成功とみなす（フォームが残っていたら失敗）
+            form_still_visible = await page.query_selector("form input[type='submit'], form button[type='submit']")
+            if form_still_visible:
+                result["error"] += "フォームにエラー表示を検出（送信ボタンが残存）"
+            else:
+                result["success"] = True
+                result["error"] += "(成功判定は推定)"
 
     except Exception as e:
         result["error"] = str(e)
