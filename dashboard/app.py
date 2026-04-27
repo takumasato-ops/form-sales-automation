@@ -195,6 +195,45 @@ def api_monthly():
     return jsonify({"labels": [d["month"] for d in data], "values": [d["sent"] for d in data]})
 
 
+@app.route("/api/overview")
+@require_login
+def api_overview():
+    """概要KPIをリアルタイム取得（10秒ごとにAjaxで呼ばれる）"""
+    config = load_config()
+    daily_limit = config["rate_limit"]["max_per_day"]
+    stats = db.get_stats()
+    today_stats = db.get_today_processing_stats()
+    yesterday_sent = db.get_yesterday_send_count()
+
+    sent = today_stats["sent"]
+    achievement = round(sent / daily_limit * 100) if daily_limit > 0 else 0
+    diff = sent - yesterday_sent
+    days_left = round(stats["pending"] / daily_limit, 1) if daily_limit > 0 else 0
+    total_proc = today_stats["total_processed"]
+
+    return jsonify({
+        "today_sent": sent,
+        "daily_limit": daily_limit,
+        "achievement": achievement,
+        "diff": diff,
+        "total_sent": stats["sent"],
+        "pending": stats["pending"],
+        "days_left": days_left,
+        "total": stats["total"],
+        "skipped": stats["skipped"],
+        "failed": stats["failed"],
+        "total_processed": total_proc,
+        "today_skipped": today_stats["skipped"],
+        "today_failed": today_stats["failed"],
+        "no_form": today_stats["no_form"],
+        "refusal": today_stats["refusal"],
+        "target_miss": today_stats["target_miss"],
+        "scrape_err": today_stats["scrape_err"],
+        "form_err": today_stats["form_err"],
+        "updated_at": datetime.now().strftime("%H:%M:%S"),
+    })
+
+
 if __name__ == "__main__":
     db.init_db()
     config = load_config()

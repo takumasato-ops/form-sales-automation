@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block title %}概要 — Canal AI ダッシュボード{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-0" style="color:#e6edf3;">ダッシュボード概要</h4>
+    <p class="text-muted mb-0" style="font-size:.85rem;">{{ today }} 現在</p>
+  </div>
+</div>
+
+<!-- KPI カード -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card kpi {% if achievement >= 100 %}green{% elif achievement >= 60 %}yellow{% else %}red{% endif %} p-3">
+      <div class="kpi-label">本日の送信</div>
+      <div class="kpi-val mt-1" style="color:{% if achievement >= 100 %}#3fb950{% elif achievement >= 60 %}#d29922{% else %}#f85149{% endif %};">
+        {{ today_stats.sent }}
+        <span style="font-size:1rem;color:#8b949e;">/ {{ daily_limit }}</span>
+      </div>
+      <div class="mt-2">
+        <div class="progress" style="height:5px;">
+          <div class="progress-bar {% if achievement >= 100 %}bg-success{% elif achievement >= 60 %}bg-warning{% else %}bg-danger{% endif %}"
+               style="width:{{ [achievement, 100]|min }}%"></div>
+        </div>
+      </div>
+      <div class="mt-1" style="font-size:.78rem;color:#8b949e;">
+        達成率 {{ achievement }}%
+        {% if diff >= 0 %}<span style="color:#3fb950;">▲{{ diff }}</span>
+        {% else %}<span style="color:#f85149;">▼{{ diff|abs }}</span>{% endif %}
+        vs昨日
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card kpi green p-3">
+      <div class="kpi-label">累計送信</div>
+      <div class="kpi-val mt-1" style="color:#3fb950;">{{ stats.sent }}</div>
+      <div class="mt-1" style="font-size:.78rem;color:#8b949e;">全期間</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card kpi p-3">
+      <div class="kpi-label">リード残量</div>
+      <div class="kpi-val mt-1" style="color:#58a6ff;">{{ stats.pending }}</div>
+      <div class="mt-1" style="font-size:.78rem;color:#8b949e;">約 {{ days_left }} 日分</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card kpi purple p-3">
+      <div class="kpi-label">累計リード</div>
+      <div class="kpi-val mt-1" style="color:#a371f7;">{{ stats.total }}</div>
+      <div class="mt-1" style="font-size:.78rem;color:#8b949e;">
+        スキップ {{ stats.skipped }} / 失敗 {{ stats.failed }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 本日の内訳 + 直近7日チャート -->
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-activity me-2"></i>本日の処理内訳</div>
+      <div class="card-body">
+        {% set total_proc = today_stats.total_processed %}
+        {% if total_proc == 0 %}
+        <p class="text-muted text-center py-3" style="font-size:.9rem;">今日はまだ処理がありません<br>7:00から自動実行されます</p>
+        {% else %}
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <span style="font-size:.85rem;color:#3fb950;"><i class="bi bi-check-circle me-1"></i>送信成功</span>
+            <span class="fw-bold" style="color:#3fb950;">{{ today_stats.sent }}</span>
+          </div>
+          <div class="progress mb-2" style="height:6px;">
+            <div class="progress-bar bg-success" style="width:{% if total_proc > 0 %}{{ (today_stats.sent / total_proc * 100)|round }}{% else %}0{% endif %}%"></div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <span style="font-size:.85rem;color:#e3b341;"><i class="bi bi-skip-forward me-1"></i>スキップ</span>
+            <span class="fw-bold" style="color:#e3b341;">{{ today_stats.skipped }}</span>
+          </div>
+          {% if today_stats.skipped > 0 %}
+          <div style="font-size:.75rem;color:#8b949e;margin-bottom:.5rem;">
+            フォームなし {{ today_stats.no_form }} /
+            営業お断り {{ today_stats.refusal }} /
+            ターゲット外 {{ today_stats.target_miss }}
+          </div>
+          {% endif %}
+        </div>
+        <div>
+          <div class="d-flex justify-content-between mb-1">
+            <span style="font-size:.85rem;color:#f85149;"><i class="bi bi-x-circle me-1"></i>失敗</span>
+            <span class="fw-bold" style="color:#f85149;">{{ today_stats.failed }}</span>
+          </div>
+          {% if today_stats.failed > 0 %}
+          <div style="font-size:.75rem;color:#8b949e;">
+            ネットワーク {{ today_stats.scrape_err }} /
+            フォームエラー {{ today_stats.form_err }}
+          </div>
+          {% endif %}
+        </div>
+        <hr style="border-color:#30363d;">
+        <div class="d-flex justify-content-between">
+          <span style="font-size:.85rem;color:#8b949e;">処理合計</span>
+          <span class="fw-bold">{{ total_proc }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-8">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-bar-chart me-2"></i>直近7日間の送信数</div>
+      <div class="card-body">
+        {% if daily_counts %}
+        <canvas id="weekChart" height="100"></canvas>
+        <script>
+        new Chart(document.getElementById('weekChart'), {
+          type: 'bar',
+          data: {
+            labels: {{ daily_counts | map(attribute='date') | list | tojson }},
+            datasets: [{
+              label: '送信成功数',
+              data: {{ daily_counts | map(attribute='count') | list | tojson }},
+              backgroundColor: 'rgba(31,111,235,0.6)',
+              borderColor: '#388bfd',
+              borderWidth: 1,
+              borderRadius: 4,
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { color:'#21262d' }, ticks: { color:'#8b949e' } },
+              y: { grid: { color:'#21262d' }, ticks: { color:'#8b949e' }, beginAtZero: true }
+            }
+          }
+        });
+        </script>
+        {% else %}
+        <p class="text-muted text-center py-4">データが蓄積されると表示されます</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- クイックリンク -->
+<div class="row g-3 mt-1">
+  <div class="col-12">
+    <div class="d-flex gap-2 flex-wrap">
+      <a href="/leads?status=pending" class="btn btn-sm btn-outline-primary">
+        <i class="bi bi-clock me-1"></i>未処理リード {{ stats.pending }}件
+      </a>
+      <a href="/leads?status=sent" class="btn btn-sm btn-outline-success">
+        <i class="bi bi-check me-1"></i>送信済み {{ stats.sent }}件
+      </a>
+      <a href="/leads?status=failed" class="btn btn-sm btn-outline-danger">
+        <i class="bi bi-x me-1"></i>失敗 {{ stats.failed }}件
+      </a>
+      <a href="/reports?period=daily" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-bar-chart me-1"></i>日次レポート
+      </a>
+      <a href="/analytics" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-pie-chart me-1"></i>定量分析
+      </a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
